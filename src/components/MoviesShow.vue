@@ -1,28 +1,26 @@
 <template>
   <div id="movies-show">
-
+    <h3>{{ movieName }}</h3>
+    <img :src="imageUrl" alt="Sorry there is no image for this film :(">
   </div>
   <!-- built files will be auto injected -->
 </template>
 
 <script>
-// import API from '../lib/ghibliAPI';
-
-// const api = new API();
+import MockDatabase from '../assets/MockDatabase';
+import MockFilmPosterObject from '../assets/MockFilmPosterObject';
 
 export default {
   mounted() {
-    this.getAllFilms();
-    setTimeout(() => {
-      this.getEachFilmsData();
-    }, 1000);
+
   },
   methods: {
 
   },
   data() {
     return {
-
+      imageUrl: MockFilmPosterObject[this.$route.params.id],
+      movieName: MockDatabase[this.$route.params.id],
     };
   },
 };
