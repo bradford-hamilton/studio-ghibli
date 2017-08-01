@@ -13,7 +13,7 @@
           <option v-for="film in films" id="drop-down">{{ film.title }}</option>
         </select>
       </form>
-      <img :src="currentFilmPosterUrl" @click="goToMovieShow(currentFilmPosterUrl)" alt="Sorry no poster for this movie!" />
+      <img :src="currentFilmPosterUrl" @click="goToMovieShow" alt="Sorry no poster for this movie!" />
     </section>
   </div>
   <!-- built files will be auto injected -->
@@ -36,29 +36,39 @@ export default {
       api.getFilms()
         .then((results) => {
           this.films = results.data;
+          this.films.forEach((film, i) => {
+            this.mockFilmDatabase[i] = film.title;
+          });
         });
     },
     getEachFilmsData() {
       for (let i = 0; i < this.films.length; i += 1) {
         api.getMovie(this.films[i].title)
           .then((results) => {
-            if (!results.data.results[0].poster_path) return 'There is no poster for this movie :(';
-            this.filmPosters[this.films[i].title] = `${this.posterUrl}${results.data.results[0].poster_path}`;
+            let image = `${this.posterUrl}${results.data.results[0].poster_path}`;
+
+            if (!results.data.results[0].poster_path) {
+              image = 'https://www.purelypoultry.com/images/georgia-giant-bobwhite-quail.jpg';
+            }
+
+            this.filmPosters[this.films[i].title] = image;
             return null;
           });
       }
     },
     onChangeHandler(e) {
       this.selected = e.target.value;
+
       Object.keys(this.filmPosters)
         .forEach((key) => {
           if (key === this.selected) this.currentFilmPosterUrl = this.filmPosters[key];
         });
     },
-    // goToMovieShow(currentFilmPosterUrl) {
-    //   const movieName = this.getKeyByValue(this.filmPosters, currentFilmPosterUrl);
-    //   Router.go(`/movies/${movieName}`);
-    // },
+    goToMovieShow() {
+      const index = this.getKeyByValue(this.mockFilmDatabase, this.selected);
+
+      this.$router.push({ name: 'MoviesShow', params: { id: index } });
+    },
     getKeyByValue(object, value) {
       return Object.keys(object).find(key => object[key] === value);
     },
@@ -70,6 +80,7 @@ export default {
       posterUrl: 'http://image.tmdb.org/t/p/w342',
       filmPosters: {},
       currentFilmPosterUrl: '',
+      mockFilmDatabase: {},
     };
   },
 };
